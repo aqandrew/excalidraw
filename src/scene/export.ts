@@ -187,25 +187,3 @@ const getCanvasSize = (
 
   return [minX, minY, width, height];
 };
-
-export const getExportSize = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  exportPadding: number,
-  shouldAddWatermark: boolean,
-  scale: number,
-): [number, number] => {
-  let [, , width, height] = getCanvasSize(
-    elements,
-    exportPadding,
-    shouldAddWatermark,
-  ).map((dimension) => Math.trunc(dimension * scale));
-
-  if (shouldAddWatermark) {
-    // exportPadding is added twice to make up for the fact that
-    //  it's omitted in getCanvasSize's returned height
-    //  if shouldAddWatermark === true
-    height += (WATERMARK_HEIGHT + exportPadding * 2) * scale;
-  }
-
-  return [width, height];
-};

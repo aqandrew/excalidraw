@@ -6,7 +6,7 @@ import { ToolButton } from "./ToolButton";
 import { clipboard, exportFile, link } from "./icons";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { exportToCanvas, getExportSize } from "../scene/export";
+import { exportToCanvas } from "../scene/export";
 import { ActionsManagerInterface } from "../actions/types";
 import Stack from "./Stack";
 import { t } from "../i18n";
@@ -46,6 +46,7 @@ const ExportModal = ({
 }) => {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [scale, setScale] = useState(defaultScale);
+  const [resolutions, setResolutions] = useState(scales.map((s) => [0, 0])); // [width, height]
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
   const {
@@ -84,6 +85,12 @@ const ExportModal = ({
     scale,
     shouldAddWatermark,
   ]);
+
+  useEffect(() => {
+    const previewNode = previewRef.current;
+    const canvas = previewNode?.querySelector("canvas");
+    setResolutions(scales.map((s) => [canvas!.width * s, canvas!.height * s]));
+  }, [shouldAddWatermark]);
 
   return (
     <div className="ExportDialog">
@@ -126,14 +133,8 @@ const ExportModal = ({
             {actionManager.renderAction("changeProjectName")}
           </div>
           <Stack.Row gap={2}>
-            {scales.map((s) => {
-              const [width, height] = getExportSize(
-                exportedElements,
-                exportPadding,
-                shouldAddWatermark,
-                s,
-              );
-
+            {scales.map((s, i) => {
+              const [width, height] = resolutions[i];
               const scaleButtonTitle = `${t(
                 "buttons.scale",
               )} ${s}x (${width}x${height})`;
