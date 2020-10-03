@@ -89,8 +89,12 @@ const ExportModal = ({
   useEffect(() => {
     const previewNode = previewRef.current;
     const canvas = previewNode?.querySelector("canvas");
-    setResolutions(scales.map((s) => [canvas!.width * s, canvas!.height * s]));
-  }, [shouldAddWatermark]);
+    const [baseWidth, baseHeight] = [
+      canvas!.width,
+      canvas!.height,
+    ].map((dimension) => Math.trunc(dimension / scale));
+    setResolutions(scales.map((s) => [baseWidth * s, baseHeight * s]));
+  }, [scale, shouldAddWatermark]);
 
   return (
     <div className="ExportDialog">
